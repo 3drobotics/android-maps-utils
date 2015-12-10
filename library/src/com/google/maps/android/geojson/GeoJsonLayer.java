@@ -30,9 +30,15 @@ import java.util.HashMap;
  */
 public class GeoJsonLayer {
 
+    static final int ALLOWED_ALL_COORDINATES = -1;
+
     private final GeoJsonRenderer mRenderer;
 
     private LatLngBounds mBoundingBox;
+
+    public GeoJsonLayer(JSONObject geoJsonFile) {
+        this(null, geoJsonFile);
+    }
 
     /**
      * Creates a new GeoJsonLayer object. Default styles are applied to the GeoJsonFeature objects.
@@ -41,12 +47,16 @@ public class GeoJsonLayer {
      * @param geoJsonFile GeoJSON data to add to the layer
      */
     public GeoJsonLayer(GoogleMap map, JSONObject geoJsonFile) {
+        this(map, geoJsonFile, ALLOWED_ALL_COORDINATES);
+    }
+
+    public GeoJsonLayer(GoogleMap map, JSONObject geoJsonFile, int maxAllowedCoordinates) {
         if (geoJsonFile == null) {
             throw new IllegalArgumentException("GeoJSON file cannot be null");
         }
 
         mBoundingBox = null;
-        GeoJsonParser parser = new GeoJsonParser(geoJsonFile);
+        GeoJsonParser parser = new GeoJsonParser(geoJsonFile, maxAllowedCoordinates);
         // Assign GeoJSON bounding box for FeatureCollection
         mBoundingBox = parser.getBoundingBox();
         HashMap<GeoJsonFeature, Object> geoJsonFeatures = new HashMap<GeoJsonFeature, Object>();

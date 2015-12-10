@@ -70,16 +70,17 @@ import java.util.Iterator;
 
     private LatLngBounds mBoundingBox;
 
-
+    private static int geometryMaxPoints = GeoJsonLayer.ALLOWED_ALL_COORDINATES;
     /**
      * Creates a new GeoJsonParser
      *
      * @param geoJsonFile GeoJSON file to parse
      */
-    /* package */ GeoJsonParser(JSONObject geoJsonFile) {
+    /* package */ GeoJsonParser(JSONObject geoJsonFile, int maxPoints) {
         mGeoJsonFile = geoJsonFile;
         mGeoJsonFeatures = new ArrayList<GeoJsonFeature>();
         mBoundingBox = null;
+        GeoJsonParser.geometryMaxPoints = maxPoints;
         parseGeoJson();
     }
 
@@ -355,10 +356,16 @@ import java.util.Iterator;
      */
     private static ArrayList<LatLng> parseCoordinatesArray(JSONArray coordinates)
             throws JSONException {
-        ArrayList<LatLng> coordinatesArray = new ArrayList<LatLng>();
+        final int coordinatesCount = coordinates.length();
+        ArrayList<LatLng> coordinatesArray = new ArrayList<>(coordinatesCount);
+        if(geometryMaxPoints != 0) {
+            int increment = geometryMaxPoints == GeoJsonLayer.ALLOWED_ALL_COORDINATES || coordinatesCount <= geometryMaxPoints
+                    ? 1
+                    : coordinatesCount / geometryMaxPoints;
 
-        for (int i = 0; i < coordinates.length(); i++) {
-            coordinatesArray.add(parseCoordinate(coordinates.getJSONArray(i)));
+            for (int i = 0; i < coordinatesCount; i += increment) {
+                coordinatesArray.add(parseCoordinate(coordinates.getJSONArray(i)));
+            }
         }
         return coordinatesArray;
     }

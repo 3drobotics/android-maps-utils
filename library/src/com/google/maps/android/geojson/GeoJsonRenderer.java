@@ -111,7 +111,7 @@ import java.util.Set;
      * map.
      */
     /* package */ void addLayerToMap() {
-        if (!mLayerOnMap) {
+        if (mMap != null && !mLayerOnMap) {
             mLayerOnMap = true;
             for (GeoJsonFeature feature : getFeatures()) {
                 addFeature(feature);
@@ -231,6 +231,9 @@ import java.util.Set;
      * @param geometry geometry to add to the map
      */
     private Object addFeatureToMap(GeoJsonFeature feature, GeoJsonGeometry geometry) {
+        if(mMap == null)
+            return null;
+
         String geometryType = geometry.getType();
         if (geometryType.equals("Point")) {
             return addPointToMap(feature.getPointStyle(), (GeoJsonPoint) geometry);
@@ -329,10 +332,10 @@ import java.util.Set;
         // First array of coordinates are the outline
         polygonOptions.addAll(polygon.getCoordinates().get(POLYGON_OUTER_COORDINATE_INDEX));
         // Following arrays are holes
-        for (int i = POLYGON_INNER_COORDINATE_INDEX; i < polygon.getCoordinates().size();
-                i++) {
-            polygonOptions.addHole(polygon.getCoordinates().get(i));
-        }
+//        for (int i = POLYGON_INNER_COORDINATE_INDEX; i < polygon.getCoordinates().size();
+//                i++) {
+//            polygonOptions.addHole(polygon.getCoordinates().get(i));
+//        }
         return mMap.addPolygon(polygonOptions);
     }
 
